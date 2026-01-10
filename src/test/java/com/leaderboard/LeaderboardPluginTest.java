@@ -1,5 +1,6 @@
 package com.leaderboard;
 
+import com.leaderboard.LeaderboardPlugin;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
