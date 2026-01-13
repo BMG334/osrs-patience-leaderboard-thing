@@ -4,7 +4,6 @@ import com.google.common.base.Splitter;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
@@ -15,18 +14,15 @@ import net.runelite.client.plugins.PluginDescriptor;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.List;
 
 import static net.runelite.http.api.RuneLiteAPI.GSON;
-import static net.runelite.http.api.RuneLiteAPI.JSON;
 
 @Slf4j
 @PluginDescriptor(
@@ -125,14 +121,14 @@ public class LeaderboardPlugin extends Plugin
 		StringBuilder leaderboard = new StringBuilder();
 		//System.out.println(client.getLocalPlayer());
 		//System.out.println(client.getLocalPlayer().getName());
-		leaderboard.append("{\"").append(client.getLocalPlayer().getName()).append("\": {");
+		leaderboard.append("{\n\"").append(client.getLocalPlayer().getName()).append("\": {");
         for (String bossName : bossNames) {
-            leaderboard.append("\"").append(bossName).append("\": [{");
+            leaderboard.append("\n\"").append(bossName).append("\": {");
             leaderboard.append("\"count\": ").append(getKc(bossName)).append(",");
-            leaderboard.append("\"pb\": ").append(getPb(bossName)).append("}],");
+            leaderboard.append("\"pb\": ").append(getPb(bossName)).append("},");
         }
 		leaderboard.setLength(leaderboard.length() - 1); //removes the last comma
-		leaderboard.append("}}"); // cap off the JSON
+		leaderboard.append("}\n}"); // cap off the JSON
 		return leaderboard.toString();
 	}
 
