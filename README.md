@@ -1,14 +1,10 @@
-# Discord Boss KC JSON Uploader
-A lightweight plugin that uploads a player's boss kc and pb to a Discord channel via a webhook. Upload only happens when you logout, to avoid spamming. What you do with that data is up to you.
+# Discord Large Json Uploader
+A lightweight plugin that aims to create configurable large (I.E. exceeds the character limit in Discord contexts) Json files that are uploaded to a discord channel for clan big data projects.
 
-JSON example:
+Uploaded message example:
+[Include Example]
 
-{
-"Username": {
-"Corporeal Beast": {"count": 0,"pb": 0.0},
-//every other boss
-}}
-
-Made for a clanmate.
+Message context: Runescape username of the uploader.
+Message attachment: .json file with the uploaded data.
 
 Webhook code based off of https://runelite.net/plugin-hub/show/discord-loot-logger.

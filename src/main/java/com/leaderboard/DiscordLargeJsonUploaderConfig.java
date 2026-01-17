@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup("leaderboard")
-public interface LeaderboardConfig extends Config
+public interface DiscordLargeJsonUploaderConfig extends Config
 {
 	@ConfigItem(
 		keyName = "webhook",

@@ -11,8 +11,12 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
 import okhttp3.*;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -23,7 +27,7 @@ import static net.runelite.http.api.RuneLiteAPI.GSON;
 @PluginDescriptor(
 	name = "Discord Boss KC JSON Uploader"
 )
-public class LeaderboardPlugin extends Plugin
+public class DiscordLargeJsonUploaderPlugin extends Plugin
 {
 	private static final String[] bossNames = {"Corporeal Beast",
 			"TzTok-Jad",
@@ -53,8 +57,8 @@ public class LeaderboardPlugin extends Plugin
 			"Wintertodt",
 			"Barrows Chests",
 			"Herbiboar",
-			// Chambers of Xeric
 
+			//Chambers of Xeric
 			"Chambers of Xeric",
 			"Chambers of Xeric Solo",
 			"Chambers of Xeric 2 players",
@@ -69,8 +73,8 @@ public class LeaderboardPlugin extends Plugin
 			"Chambers of Xeric 11-15 players",
 			"Chambers of Xeric 16-23 players",
 			"Chambers of Xeric 24+ players",
-			// Chambers of Xeric Challenge Mode
 
+			//Chambers of Xeric Challenge Mode
 			"Chambers of Xeric Challenge Mode",
 			"Chambers of Xeric Challenge Mode Solo",
 			"Chambers of Xeric Challenge Mode 2 players",
@@ -85,8 +89,8 @@ public class LeaderboardPlugin extends Plugin
 			"Chambers of Xeric Challenge Mode 11-15 players",
 			"Chambers of Xeric Challenge Mode 16-23 players",
 			"Chambers of Xeric Challenge Mode 24+ players",
-			//TOB
 
+			//TOB
 			"Theatre of Blood",
 			"Theatre of Blood Solo",
 			"Theatre of Blood 2 players",
@@ -99,8 +103,8 @@ public class LeaderboardPlugin extends Plugin
 			"Theatre of Blood Hard Mode 3 players",
 			"Theatre of Blood Hard Mode 4 players",
 			"Theatre of Blood Hard Mode 5 players",
-			//TOA
 
+			//TOA
 			"Tombs of Amascut",
 			"Tombs of Amascut Solo",
 			"Tombs of Amascut 2 players",
@@ -132,8 +136,8 @@ public class LeaderboardPlugin extends Plugin
 			"Corrupted Gauntlet",
 			"Nightmare",
 			"Phosani's Nightmare",
-			//Hallowed Sepulcher is a boss, right?
 
+			//Hallowed Sepulcher is a boss, right?
 			"Hallowed Sepulchre",
 			"Hallowed Sepulchre Floor 1",
 			"Hallowed Sepulchre Floor 2",
@@ -163,11 +167,14 @@ public class LeaderboardPlugin extends Plugin
 			"Doom of Mokhaiotl"
 	};
 
+	private DiscordLargeJsonUploaderPanel panel;
+	private NavigationButton navButton;
+
 	@Inject
 	private Client client;
 
 	@Inject
-	private LeaderboardConfig config;
+	private DiscordLargeJsonUploaderConfig config;
 
 	@Inject
 	private OkHttpClient okHttpClient;
@@ -175,9 +182,21 @@ public class LeaderboardPlugin extends Plugin
 	@Inject
 	private ConfigManager configManager;
 
+	@Inject
+	private ClientToolbar clientToolbar;
+
 	@Override
 	protected void startUp() throws Exception
 	{
+		panel = new DiscordLargeJsonUploaderPanel(config);
+		final BufferedImage icon = ImageUtil.loadImageResource(DiscordLargeJsonUploaderPlugin.class, "/leaderboard_panel_icon.png");
+		navButton = NavigationButton.builder()
+				.tooltip("Tile Packs")
+				.icon(icon)
+				.priority(7)
+				.panel(panel)
+				.build();
+		clientToolbar.addNavigation(navButton);
 	}
 
 	@Override
@@ -186,9 +205,9 @@ public class LeaderboardPlugin extends Plugin
 	}
 
 	@Provides
-    LeaderboardConfig provideConfig(ConfigManager configManager)
+	DiscordLargeJsonUploaderConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(LeaderboardConfig.class);
+		return configManager.getConfig(DiscordLargeJsonUploaderConfig.class);
 	}
 
 	@Subscribe
@@ -196,7 +215,6 @@ public class LeaderboardPlugin extends Plugin
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGIN_SCREEN)
 		{
-			// Your logic to run on login goes here
 			String leaderboard = compileLeaderboard();
 			WebhookBody webhookBody = new WebhookBody();
 			webhookBody.setContent(client.getLocalPlayer().getName());
@@ -209,12 +227,12 @@ public class LeaderboardPlugin extends Plugin
 		StringBuilder leaderboard = new StringBuilder();
 		leaderboard.append("{");
         for (String bossName : bossNames) {
-            leaderboard.append("\n\"").append(bossName).append("\": {");
+            leaderboard.append("\"").append(bossName).append("\": {");
             leaderboard.append("\"count\": ").append(getKc(bossName)).append(",");
-            leaderboard.append("\"pb\": ").append(getPb(bossName)).append("},\n");
+            leaderboard.append("\"pb\": ").append(getPb(bossName)).append("},");
         }
-		leaderboard.setLength(leaderboard.length() - 1); //removes the last comma
-		leaderboard.append("\n}"); // cap off the JSON
+		leaderboard.setLength(leaderboard.length() - 1); //Removes the last comma
+		leaderboard.append("}"); //Cap off the JSON
 		return leaderboard.toString();
 	}
 
